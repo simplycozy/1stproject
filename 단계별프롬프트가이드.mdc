@@ -1,0 +1,587 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 단계별 프롬프트 가이드
+
+ 📖 사용법
+각 단계의 프롬프트를 순서대로 실행하여 인터랙티브 웹 디자인 포트폴리오를 구축합니다.
+
+---
+
+ 🏗️ Group 1-2: 기본 구조 설정
+
+1-1. 라우터 및 앱 기본 구조 설정
+
+
+2개 페이지로 구성된 포트폴리오 사이트의 기본 구조를 잡아주세요.
+(페이지 구성만하고 내용은 임시 플레이스 홀더)
+
+페이지 구조:
+- react-routed-dom을 설피하고 아래 페이지를 구성해줘.
+- LandingPage.jsx (메인 "/" 경로): 전체 포트폴리오 소개 페이지
+- ProjectDetail.jsx ("/project/:id" 경로): 개별 프로젝트 상세 페이지
+
+먼저 폰트 계층구조를 적용해주세요:
+- 본문/설명 텍스트: Pretendard Variable (부드럽고 읽기 좋은 한글 폰트)
+- 제목/헤드라인: Blackout-Midnight (강한 임팩트의 영문 폰트) 
+- 대체 폰트: Roboto → Helvetica → Arial → sans-serif 순서
+- 한글은 단어 단위로 줄바꿈, 모바일에서 폰트 크기 자동 조정
+
+이미 준비된 컴포넌트들을 활용해서 전역 기능을 설정해주세요:
+
+콘텐츠 데이터 시스템:
+- contentData.js에서 모든 섹션의 텍스트를 중앙 관리
+- 브랜드명 "Ordinary Design", 메뉴 텍스트 "Projects/Contact" 등 사이트 전체 문구 통합
+- heroContent, missionContent 등 데이터 객체를 직접 import하여 사용
+- UI와 데이터 분리로 콘텐츠 수정 시 한 곳에서만 변경 가능
+
+CustomTooltipCursor 컴포넌트 (commons 폴더):
+- 링크나 버튼에 마우스 올리면 크기가 커지고 빛나는 효과
+- 배경 밝기에 따라 커서 색상 자동 조정
+- [BackgroundContext.jsx](mdc:src/context/BackgroundContext.jsx) 사용해줘.
+
+useLenisScroll 훅 (hooks 폴더):
+- 일반 브라우저 스크롤보다 훨씬 부드러운 스크롤 구현
+- GSAP ScrollTrigger와 연동하여 스크롤 기반 애니메이션 정확도 향상
+- 페이지 이동 후 돌아왔을 때 원래 스크롤 위치로 자동 복원
+
+BackgroundLayer 컴포넌트 (commons 폴더):
+- 화면 전체를 덮는 고정된 배경 레이어
+- 스크롤 위치에 따라 전체 화면 배경색이 부드럽게 전환
+- BackgroundContext로 섹션별 배경색 자동 관리
+
+Header 컴포넌트 (commons 폴더):
+- 투명한 배경의 상단 고정 헤더
+- "Ordinary Design" 로고와 Projects/Contact 메뉴 포함
+- SectionRefsContext를 사용한 섹션 이동 네비게이션 기능
+
+
+1-2. 랜딩페이지 기본 섹션 구조 설정
+
+
+LandingPage.jsx 메인 포트폴리오 페이지를 4개의 큰 섹션으로 나누어 만들어주세요.
+
+TopSection.jsx는 FreeHorizontalScrollSection 컴포넌트로 3개의 하위 섹션들을 가로 스크롤로 관리합니다.
+
+위에서 아래로 순서대로 배치될 섹션들:
+
+1. TopSection.jsx (첫 번째 섹션):
+   - FreeHorizontalScrollSection(height="100vh")으로 3개 섹션을 가로 스크롤로 관리
+   
+   1-1. HeroSection 컴포넌트:
+   - FullPageSection(widthType="vw")으로 전체 뷰포트 폭 차지
+   - import { heroContent } from [contentData.js](mdc:src/data/contentData.js) 로 데이터 가져와서 heroContent.mainText, heroContent.typingSpeed 등 직접 사용
+   - TypingEffect 컴포넌트로 동적 타이핑 효과와 함께 좌측하단 배치
+   - HumanIllustCarousel(pathType="horizontal", theme="light")을 배경 전체에 배치
+   - 좌측 패딩으로 텍스트와 배경 일러스트 분리
+    강의중 작성
+   - useBackground('light') 모드 전환 + [useIsInView.js](mdc:src/hooks/useIsInView.js) 사용
+   
+   1-2. TransitionSection 컴포넌트:
+   - 300vw 초대형 폭 (뷰포트의 3배 너비)으로 가로 스크롤 영역에서 압도적 존재감
+   - transitionContent에서 "ORDINARY" 텍스트 가져오기
+   -  [MaskingText.jsx](mdc:src/components/patterns/typoraphy/MaskingText.jsx)  컴포넌트 + ordinary_people.png로 텍스트 모양 이미지 마스킹
+   - calc(100cqw / 5) 폰트 사이즈로 300vw 폭을 완벽하게 채우는 타이포그래피
+   - Container Query Units 활용해 컨테이너 크기에 맞춰 텍스트 자동 조정
+    강의중 작성
+   - useBackground('dark') 모드 전환 + @useIsInView.js 사용
+
+ 강의중 작성
+   각 섹션의 @useIsInView.js 의 thresold 값을 조정해서 @TransitionSection.jsx 이 10%만 보여둬 dark로 설정
+   
+   1-3. MissionSection 컴포넌트:
+   - FullPageSection(widthType="vw")으로 전체 뷰포트 폭 차지
+   - missionContent에서 "Ordinary Mission" 제목과 브랜드 미션 메시지 가져오기
+   - "Ordinary Design은 평범한 사람들의 꿈을 고민합니다" 등 실제 브랜드 스토리 표시
+   - HumanIllustCarousel(pathType="circle", theme="dark")을 화면 중앙에 원형 배치
+   - 텍스트는 z-index로 일러스트 위에 오버레이
+
+    강의중 작성
+   @useBackground 는 @TransitionSection.jsx  이후에는 사용하지 않는다. 그 이후로는 계속 다크 모드이기댸문에 그래서 @MissionSection.jsx 에 관련 코드를 삭제
+   
+2. StorySection.jsx (두 번째 섹션):
+   - [StickySection.jsx](mdc:src/components/commons/container/StickySection.jsx) 으로 이미지 고정 + 텍스트 스크롤 구조
+   - [story.png](mdc:src/assets/photo/story.png) 배경 이미지가 스크롤하면서 서서히 축소되고 흐려지는 효과
+   - storyContent에서 김도연 베이커리 Bloom 대표 정보와 스토리 가져오기
+   - "반죽과 제 진짜 삶이 부풀어 오르는 중입니다" 메인 메시지를 배열로 관리
+   - "손으로 반죽하고, 굽고, 나누는 일..." 인용구와 출처가 애니메이션으로 등장
+   
+3. ProjectsSection.jsx (세 번째 섹션):
+   - 일반 Box 컨테이너 (FullPageSection 미사용)
+   - ParallaxContainer(maxZ={8})로 8개 레이어 깊이 관리
+   - 배경/제목/카드/장식 요소를 각각 다른 ParallaxLayer에 배치
+   - projectsContent에서 "Ordinary Projects" 섹션 제목 가져오기
+   -  [projectsData.js](mdc:src/data/projectsData.js) 에서 프로젝트 데이터 가져오기
+   - [ProjectCard.jsx](mdc:src/components/commons/ProjectCard.jsx) 들을 Grid(xs: 6, md: 6, lg: 4) 반응형 격자로 배치
+   - 각 카드마다 리듬감 있는 depthZ 패턴으로 입체적 패럴랙스 효과
+
+    강의중 발생
+
+   @ProjectsSection.jsx  @/scroll 안에있는 ParallaxContainer ParallaxLayer를 사용
+
+   @ProjectsSection.jsx 
+
+    - 불필요한 장식요소 모두 제거
+    - 배치 규칙
+    가장 밖에 패럴럭스 컨테이너 > @projectsData.js 로 Grid (2열 )로 레이아웃 배치 > 레이아웃 안에 @ProjectCard.jsx 
+    - 위 내용외에 어떤것도 추가 금지
+
+     강의중 발생
+    ParallaxLayer의 depth값에 의한 내부 ProjectCard를 Box로 감쌓은 뒤에 아래와같이 크기 조절
+
+    - 높을수록 작게 보이고
+    - 낮을수록 크게 보이게
+
+    사이즈는 원래 크기보다 크면 안되고
+    제일 가까이있는 뎁스기준 1
+    그보다 멀리있는것은 1이하
+   
+4. ContactSection.jsx (마지막 섹션):
+   - FullPageSection으로 전체 화면 높이 차지
+   - HumanIllustCarousel(pathType="horizontal", theme="dark")을 배경 전체에 배치
+   - contactContent에서 "Let's Work Together" 제목과 서브타이틀 가져오기
+   - "평범한 사람들을 위한 디자인, 함께 만들어 나가요" 서브타이틀 표시
+   - 하단에 이메일 "hello@ordinary.design"과 전화번호를 큰 폰트로 표시
+   - flex 레이아웃으로 좌우 분할하여 연락처 정보 배치
+   - useBackground('dark') 모드 전환
+   - [contentData.js](mdc:src/data/contentData.js) 활용
+
+각 섹션은 BackgroundContext를 통해 배경색이 다르게 설정되며, 스크롤하면서 부드럽게 전환됩니다.
+SectionRefsContext를 사용하여 헤더 메뉴 클릭 시 해당 섹션으로 자동 스크롤됩니다.
+
+
+2-1. 프로젝트 상세 페이지 기본 구조
+
+
+ProjectDetail.jsx 페이지를 만들어 메인 페이지의 ProjectCard 클릭 시 표시될 상세 페이지를 구현해주세요.
+
+페이지 구성 (위에서 아래 순서로):
+- 뒤로가기 버튼 (useNavigate 훅으로 메인 페이지로 돌아가기)
+- 프로젝트 이름 (큰 제목)
+- 프로젝트 정보 레이아웃 (클라이언트명, 제작연도, 작업기간, 서비스 종류)
+- 프로젝트 설명 텍스트
+- 추가 이미지들 갤러리 배치
+- 이전/다음 프로젝트 네비게이션 버튼
+
+특별한 기능:
+- useParams 훅으로 "/project/:id" 형태 URL 파라미터 처리
+- projectsData.js에서 해당 ID 프로젝트 데이터 조회
+- 존재하지 않는 프로젝트 ID 접근 시 404 컴포넌트 표시
+- useLenisScroll 훅으로 뒤로가기 시 메인 페이지 원래 스크롤 위치 복귀
+- FadeInContainer 컴포넌트로 이미지 부드러운 로딩 애니메이션
+- useResponsive 훅으로 모바일/데스크탑 이미지 크기 자동 조정
+
+getProjectById() 함수로 projectsData.js에서 특정 프로젝트 데이터를 가져와 표시합니다.
+
+
+2-2. 헤더 네비게이션 상세 구현
+
+
+StickyContainer 컴포넌트를 사용해서 화면 상단에 항상 보이는 투명한 헤더 메뉴를 만들어주세요.
+
+헤더 구성:
+- 왼쪽: siteMetadata에서 가져온 브랜드명 표시
+  - 평상시: "Ordinary Design" 전체 브랜드명 표시
+  - 스크롤하면: "OD"로 줄어드는 애니메이션 효과 (축약형)
+  - 클릭하면: 메인 페이지 맨 위로 부드럽게 스크롤
+  
+- 오른쪽: siteMetadata에서 가져온 메뉴 항목들
+  - "Projects", "Contact" 메뉴 표시
+  - 데스크탑: 메뉴가 나란히 보임, 마우스 인터랙션 효과
+  - 모바일: 햄버거 버튼 → 전체화면 메뉴 형태
+
+특별한 동작:
+- StickyContainer로 항상 화면 최상단에 고정 (스크롤해도 따라다님)
+- 배경이 투명해서 뒤의 내용이 살짝 보임
+- BackgroundContext 연동으로 배경 밝기에 따라 텍스트 색상 자동 변경
+- 메뉴 클릭 시 SectionRefsContext를 통해 해당 섹션으로 부드럽게 자동 스크롤
+- 프로젝트 상세 페이지에서도 메뉴 클릭 시 메인 페이지로 돌아가서 해당 섹션으로 이동
+
+가독성을 위해 GradientTypography 컴포넌트로 미세한 그라데이션 효과를 적용해주세요.
+
+
+---
+
+ 🧩 Group 3-4: 컴포넌트 조립
+
+3-1. TopSection 가로 스크롤 구현
+
+
+FreeHorizontalScrollSection 컴포넌트를 사용해서 TopSection.jsx 최상단 섹션을 만들어주세요.
+
+구성:
+- 전체 화면 높이를 차지하는 가로 스크롤 영역
+- 세로 스크롤하면 가로로 이동하는 3개 화면
+
+1단계 - HeroSection 컴포넌트:
+- DesignLogo 컴포넌트로 "Ordinary Design" 대형 타이틀 (SVG 패스 애니메이션)
+- FadeInTypography 컴포넌트로 애니메이션 효과가 있는 서브타이틀
+- 브랜드의 첫인상을 강하게 전달
+
+2단계 - TransitionSection 컴포넌트:
+- InteractiveTypography 컴포넌트로 브랜드 소개 중간 연결 텍스트
+- 마우스 인터랙션 효과로 사용자 참여 유도
+- Hero에서 Mission으로 자연스럽게 연결
+
+3단계 - MissionSection 컴포넌트:
+- GradientTypography 컴포넌트로 미션 스테이트먼트 텍스트
+- 그라데이션 색상 효과로 시각적 임팩트
+- 브랜드 가치와 비전 표현
+
+GSAP ScrollTrigger 패턴 사용:
+- 세로 스크롤을 가로 이동으로 변환하는 transform 애니메이션
+- 스크롤 진행도에 따른 BackgroundContext 색상 변화 (밝은색→어두운색)
+- 모바일에서 터치 스와이프 지원 및 관성 스크롤
+
+
+3-2. StorySection 스티키 구현
+
+
+StickySection 컴포넌트를 사용해서 브랜드 스토리 섹션을 구현해주세요.
+
+레이아웃 구조:
+- 고정 배경 영역: GradientBox 컴포넌트 또는 MeshGradientBox 컴포넌트 사용
+- 스크롤 컨텐츠: FadeInTypography 컴포넌트로 텍스트 기반 스토리 내용
+
+스티키 효과:
+- 사용자가 스크롤할 때 배경은 고정되고 텍스트만 스크롤
+- 스크롤 진행도에 따라 배경 투명도나 색상 변화
+- FadeInContainer 컴포넌트로 텍스트 순차 등장 효과
+
+컨텐츠 구성:
+- ScrambleText 컴포넌트로 브랜드 스토리 제목
+- FadeInTypography 컴포넌트로 여러 단락의 설명 텍스트
+- 각 텍스트 블록은 스크롤 시 순차적으로 나타남
+- InteractiveTypography 컴포넌트로 특정 키워드 강조
+
+배경 설정:
+- GradientBox 컴포넌트로 동적 그라데이션 배경
+- 또는 ScrollGradientBackground 컴포넌트로 스크롤 반응형 배경
+- 텍스트 가독성을 위한 배경 투명도 조정
+
+전체 섹션 높이는 컨텐츠 길이에 따라 자동 조정되며, 자연스러운 스크롤 플로우를 유지해주세요.
+
+
+3-3. HumanIllustCarousel 템플릿 구현
+
+
+SVGPathCarousel 컴포넌트를 활용한 인터랙티브 캐러셀 템플릿을 만들어주세요.
+
+캐러셀 구성:
+- SVGPathCarousel 컴포넌트로 패스 기반 이동 애니메이션
+- 여러 일러스트레이션 이미지들의 자동 순환 표시
+- 부드러운 페이드 전환 애니메이션과 패스 이동
+- 마우스 호버 시 자동 재생 일시정지
+
+시각적 효과:
+- AnimatedPath 컴포넌트로 경로 시각화
+- FadeInContainer 컴포넌트로 이미지 로딩 애니메이션
+- ImagePlaceholder 컴포넌트로 로딩 상태 표시
+- 반응형 크기 조정 및 비율 유지
+
+인터랙션:
+- SVGPathCarousel의 pathType 설정으로 다양한 이동 경로
+- 터치/스와이프 지원 (모바일)
+- 마우스 인터랙션으로 속도 조절
+
+설정 가능한 옵션:
+- pathType: "horizontal", "vertical", "circular" 등
+- speed: 이동 속도 조절
+- elementSize: 요소 크기 설정
+- pathColor: 경로 색상 설정
+
+assets 폴더의 일러스트레이션 파일들을 사용하며, 
+ImagePlaceholder로 로딩 성능 최적화를 적용해주세요.
+
+
+4-1. ProjectsSection 그리드 구현
+
+
+FadeInGrid 컴포넌트 + CardContainer 컴포넌트를 조합해서 프로젝트 섹션을 만들어주세요.
+
+CardContainer 컴포넌트 설정:
+- projectsData.js의 모든 프로젝트 데이터 자동 매핑
+- 각 카드: 3:4 비율 썸네일 + 제목 + 설명
+- 카드 클릭 시 "/project/:id" 페이지로 이동
+- hoverEffect="scale" 설정으로 호버 시 스케일업 + 그림자 효과
+
+FadeInGrid 컴포넌트 설정:
+- 반응형 그리드 (데스크탑 3열, 태블릿 2열, 모바일 1열)
+- 스크롤 진입 시 카드들이 순차적으로 나타남
+- 각 카드마다 0.1초씩 지연되는 스태거 애니메이션
+
+ImagePlaceholder 컴포넌트 사용:
+- 이미지 로딩 중 placeholder 표시
+- lazy loading으로 성능 최적화
+
+ParallaxContainer와 ParallaxLayer로 래핑:
+- 스크롤 시 미세한 패럴랙스 효과
+- 적절한 여백과 중앙 정렬
+
+
+4-2. ContactSection 구현
+
+
+FullPageSection + HumanIllustCarousel 컴포넌트를 조합해서 연락처 섹션을 만들어주세요.
+
+FadeInTypography 컴포넌트로 섹션 제목:
+- "Contact" 또는 "연락하기" 헤딩
+
+연락처 정보 구성:
+- 이메일 주소 (mailto: 링크로 메일 앱 실행)
+- 소셜 미디어 링크 (Instagram, LinkedIn, GitHub)
+- InteractiveTypography 컴포넌트로 링크 텍스트에 호버 효과
+- 새 탭에서 열기, 마우스 인터랙션 효과
+
+HumanIllustCarousel 템플릿 배치:
+- 인간 일러스트레이션 이미지들의 자동 순환 표시
+- 부드러운 페이드 전환 애니메이션
+- 마우스 호버 시 자동 재생 일시정지
+
+FullPageSection 컴포넌트 설정:
+- 전체 화면 높이 섹션
+- useIsInView 훅으로 뷰포트 감지
+- useBackground 훅으로 배경색 관리
+
+BackgroundContext 연동:
+- 차분한 배경색으로 전환
+- 텍스트 가독성 높은 컬러 조합
+
+
+---
+
+ 🎯 Group 5-6: 페이지 완성
+
+5-1. 데이터 기반 동적 렌더링 통합
+
+
+모든 섹션과 페이지에서 데이터 파일들을 연동하여 동적 렌더링을 구현해주세요.
+
+주요 데이터 연동:
+1. contentData.js → 모든 섹션의 텍스트 콘텐츠를 각 섹션 컴포넌트에서 가져와 UI 바인딩
+2. projectsData.js → FadeInGrid + CardContainer 조합으로 ProjectsSection 렌더링
+3. gradientPalettes.js → GradientBox, MeshGradientBox, ScrollGradientBackground 컴포넌트 설정
+4. 이미지 assets → ImagePlaceholder 컴포넌트로 모든 섹션의 비주얼 요소
+
+콘텐츠 데이터 연동:
+- heroContent로 메인 텍스트와 타이핑 설정 가져오기
+- missionContent로 제목과 브랜드 미션 메시지 가져오기
+- storyContent로 김도연 베이커리 Bloom 스토리와 인용구 가져오기
+- contactContent로 제목과 연락처 정보 가져오기
+- siteMetadata로 브랜드명과 네비게이션 메뉴 가져오기
+
+ProjectsSection 데이터 연동:
+- projectsContent로 섹션 제목 가져오기
+- getProjectsList() 함수로 projectsData에서 프로젝트 목록 가져오기
+- CardContainer 컴포넌트에 각 프로젝트의 썸네일, 제목, 설명 자동 매핑
+- linkTo props로 프로젝트 ID 기반 상세 페이지 라우팅
+
+ProjectDetail 페이지 데이터 연동:
+- getProjectById() 함수로 URL 파라미터 ID에 해당하는 프로젝트 데이터 조회
+- 존재하지 않는 ID일 경우 404 컴포넌트 표시
+- FadeInContainer로 이미지 갤러리 동적 생성
+- 이전/다음 프로젝트 네비게이션 자동 연결
+
+배경 시스템 데이터 연동:
+- gradientPalettes.js에서 GradientBox palette props로 섹션별 색상 설정
+- ScrollGradientBackground 컴포넌트로 스크롤 진행도에 따른 색상 자동 전환
+- BackgroundContext 연동으로 테마 모드에 따른 색상 변화
+
+오류 처리:
+- ImagePlaceholder 컴포넌트로 이미지 로딩 실패 시 대체 표시
+- 데이터 없을 시 기본값 설정
+- 네트워크 오류 대응
+
+모든 데이터 연동은 기존 패턴 컴포넌트 구조를 유지하면서 동적으로 처리해주세요.
+
+콘텐츠 수정 시 활용법:
+javascript
+// contentData.js에서 한 번만 수정하면 전체 사이트에 반영
+export const heroContent = {
+  mainText: "Design For\nOrdinary People", // 메인 텍스트 수정
+  typingSpeed: 60, // 타이핑 속도 조절
+  startDelay: 300  // 시작 지연 시간 조절
+};
+
+// 각 섹션에서 데이터 사용
+const heroData = getHeroContent();
+<TypingEffect 
+  texts={[heroData.mainText]}
+  typingSpeed={heroData.typingSpeed}
+  startDelay={heroData.startDelay}
+/>
+
+
+
+5-2. 페이지 간 전환 및 상태 관리
+
+
+페이지 간 부드러운 전환과 상태 유지 기능을 구현해주세요.
+
+라우터 전환 효과:
+- 페이지 이동 시 부드러운 페이드 효과
+- 로딩 상태 표시 (큰 이미지 로딩 시)
+- 전환 중 사용자 인터랙션 제한
+
+스크롤 위치 복원:
+- 프로젝트 상세에서 뒤로가기 시 원래 스크롤 위치 복원
+- 브라우저 뒤로가기/앞으로가기 지원
+- 새로고침 시에도 자연스러운 위치 설정
+
+전역 상태 관리:
+- 현재 활성 섹션 추적
+- 테마 모드 상태 유지
+- 배경색 상태 관리
+
+Context 기반 상태:
+- SectionRefsContext: 섹션 참조 및 네비게이션
+- BackgroundContext: 배경색 전환 관리
+- 필요한 경우 추가 Context 생성
+
+성능 최적화:
+- 페이지 전환 시 불필요한 리렌더링 방지
+- 스크롤 이벤트 최적화
+- 이미지 프리로딩
+
+브라우저 호환성:
+- 모든 주요 브라우저에서 정상 동작
+- 모바일 브라우저 최적화
+- 뒤로가기 버튼 지원
+
+페이지 전환 시 자연스러운 사용자 경험을 제공하고, 상태 손실 없이 매끄러운 내비게이션을 구현해주세요.
+
+
+6-1. 인터랙티브 요소 통합
+
+
+모든 페이지와 섹션에 인터랙티브 요소들을 통합해주세요.
+
+커스텀 커서 시스템:
+- 기본 상태: 원형 커서 ('O' 모양)
+- 클릭 상태: 'D' 모양으로 변환
+- 링크/버튼 호버: 크기 확대 및 글로우 효과
+- 특정 요소에서 툴팁 표시 기능
+
+스크롤 기반 애니메이션:
+- 각 섹션 진입 시 컨텐츠 페이드인
+- 텍스트 요소들의 순차적 등장
+- 이미지 요소들의 부드러운 로딩 애니메이션
+- 스크롤 진행도에 따른 배경 변화
+
+마이크로 인터랙션:
+- 버튼 호버 시 미세한 움직임
+- 카드 호버 시 스케일 변화
+- 링크 클릭 시 피드백 효과
+- 폼 요소 포커스 상태
+
+텍스트 애니메이션:
+- 메인 타이틀에 타이핑 효과 또는 스크램블 효과
+- 중요 텍스트에 그라데이션 애니메이션
+- 스크롤 시 텍스트 스태거 효과
+
+성능 고려사항:
+- 애니메이션 60fps 유지
+- 모바일에서 과도한 애니메이션 제한
+- 배터리 절약을 위한 애니메이션 최적화
+- prefers-reduced-motion 설정 고려
+
+모든 인터랙션은 직관적이고 자연스러우며, 사용자 경험을 향상시키는 방향으로 구현해주세요.
+
+
+6-2. 전체 사이트 플로우 검증
+
+
+완성된 사이트의 전체 사용자 플로우를 검증하고 최적화해주세요.
+
+주요 플로우 테스트:
+1. 메인페이지 진입 → 각 섹션 스크롤 → 프로젝트 클릭 → 상세 페이지 → 뒤로가기
+2. 헤더 네비게이션을 통한 섹션 이동
+3. 모바일에서의 터치 인터랙션
+4. 다양한 화면 크기에서의 레이아웃
+
+검증 항목:
+- 모든 링크와 버튼의 정상 동작
+- 이미지 로딩 및 표시 상태
+- 애니메이션 타이밍과 자연스러움
+- 스크롤 성능과 부드러움
+- 페이지 전환의 매끄러움
+
+오류 처리:
+- 존재하지 않는 프로젝트 ID 접근 시 처리
+- 이미지 로딩 실패 시 대체 표시
+- 네트워크 연결 문제 시 안내
+- JavaScript 비활성화 시 기본 기능 보장
+
+접근성 검토:
+- 키보드 네비게이션 지원
+- 스크린 리더 호환성
+- 색상 대비 적절성
+- 텍스트 크기 조정 대응
+
+최종 최적화:
+- 불필요한 렌더링 제거
+- 메모리 누수 방지
+- 애니메이션 성능 튜닝
+- 전체적인 사용자 경험 완성도
+
+모든 기능이 의도대로 동작하고, 사용자가 직관적으로 사이트를 탐색할 수 있도록 전체 플로우를 완성해주세요.
+
+
+---
+
+ 🔧 Group 반응형+스크롤: 최적화
+
+7-1. 반응형 레이아웃 최적화'
+
+ 강의중 발생
+@App.jsx 모바일 버전에는@CustomTooltipCursor.jsx  비활성화
+
+
+모든 화면 크기에서 최적의 사용자 경험을 제공하는 반응형 레이아웃을 구현해주세요.
+
+브레이크포인트 설정:
+- xs (0-600px): 모바일 폰
+- sm (600-900px): 태블릿 세로
+- md (900-1200px): 태블릿 가로/작은 데스크탑
+- lg (1200-1536px): 데스크탑
+- xl (1536px+): 큰 화면
+
+섹션별 반응형 최적화:
+
+TopSection (가로 스크롤):
+- 모바일: 세로 스크롤로 전환하거나 간소화된 가로 스크롤
+- 태블릿: 적절한 터치 인터랙션 지원
+- 데스크탑: 풀 가로 스크롤 경험
+
+ProjectsSection:
+- 모바일: 1열 그리드, 카드 크기 최적화
+- 태블릿: 2열 그리드, 적절한 간격
+- 데스크탑: 3-4열 그리드, 호버 효과
+
+텍스트 요소:
+- 동적 폰트 크기 조정 (vw 단위 활용)
+- 줄 간격과 여백의 화면별 최적화
+- 긴 텍스트의 읽기 편의성 보장
+
+이미지 최적화:
+- 화면 크기별 이미지 해상도 조정
+- 레티나 디스플레이 대응
+- WebP 형식 지원 및 fallback
+
+내비게이션:
+- 모바일: 햄버거 메뉴와 풀스크린 드로어
+- 태블릿: 적응형 메뉴 레이아웃
+- 데스크탑: 전체 메뉴 표시
+
+터치 인터랙션:
+- 터치 타겟 크기 44px 이상 보장
+- 스와이프 제스처 지원
+- 핀치 줌 방지 설정
+
+성능:
+- 화면 크기별 불필요한 애니메이션 제한
+- 모바일에서 배터리 효율성 고려
+- 로딩 속도 최적화
+
