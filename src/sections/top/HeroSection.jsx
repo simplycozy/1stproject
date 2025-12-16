@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useEffect, useRef, memo } from 'react';
+import { Box } from '@mui/material';
 import { useBackground } from '../../context/BackgroundContext';
 import { heroContent } from '../../data/contentData';
 import FullPageSection from '../../components/commons/container/FullPageSection';
 import HumanIllustCarousel from '../../template/HumanIllustCarousel';
 import TypingEffect from '../../components/patterns/typoraphy/TypingEffect';
 import useIsInView from '../../hooks/useIsInView';
+import { devLog } from '../../utils/logger';
 
 /**
  * HeroSection
@@ -15,32 +16,43 @@ import useIsInView from '../../hooks/useIsInView';
  *
  * Example usage:
  * <HeroSection />
+ *
+ * Note: 텍스트 색상은 CSS 커스텀 프로퍼티(--theme-text-color)를 통해
+ * BackgroundLayer에서 설정됨 (React 리렌더링 없이 색상 전환)
  */
 function HeroSection() {
-  const { backgroundMode, updateBackgroundMode } = useBackground();
+  const { updateBackgroundMode } = useBackground();
   const [ref, isInView] = useIsInView({ threshold: 0.7, triggerOnce: false });
-  const textColor = backgroundMode === 'light' ? '#000000' : '#ffffff';
+  const isFirstRender = useRef(true);
 
   // ref에 섹션 이름 추가 (디버깅용)
   useEffect(() => {
     if (ref.current) {
       ref.current.setAttribute('data-section', 'HeroSection');
     }
-  }, []);
+  }, [ref]);
 
   useEffect(() => {
-    console.log('👁️ [HeroSection] isInView changed:', {
+    // 첫 렌더링은 건너뜀 (초기 false 상태 로깅 방지)
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      // 첫 렌더링이어도 isInView가 true면 배경 모드 업데이트는 실행
+      if (isInView) {
+        updateBackgroundMode('light');
+      }
+      return;
+    }
+
+    devLog('👁️ [HeroSection] isInView changed:', {
       isInView,
-      timestamp: new Date().toISOString(),
       scrollY: window.scrollY || window.lenis?.scroll || 0,
-      elementBounds: ref.current?.getBoundingClientRect(),
     });
-    
+
     // 섹션이 뷰포트에 보일 때 light 모드로 전환
     if (isInView) {
       updateBackgroundMode('light');
     }
-  }, [isInView, updateBackgroundMode, ref]);
+  }, [isInView, updateBackgroundMode]);
 
   return (
     <FullPageSection
@@ -92,7 +104,7 @@ function HeroSection() {
           deleteSpeed={heroContent.deleteSpeed}
           startDelay={heroContent.startDelay}
           cursorType={heroContent.cursorType}
-          textColor={textColor}
+          textColor="var(--theme-text-color, #000000)"
           cursorColor="#9e9e9e"
           cursorBlinkDuration={1.4}
           fontFamily="Blackout-Midnight, sans-serif"
@@ -112,5 +124,5 @@ function HeroSection() {
   );
 }
 
-export default HeroSection;
+export default memo(HeroSection);
 

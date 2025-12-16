@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { devLog } from '../utils/logger';
 
 /**
  * 실제 뷰포트 감지 커스텀 훅
@@ -16,11 +17,12 @@ function useIsInView(options = {}) {
     rootMargin = '0px',
     triggerOnce = true,
   } = options;
-  
+
   const ref = useRef(null);
   const [isInView, setIsInView] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const observerRef = useRef(null);
+  const prevIsInViewRef = useRef(null); // 이전 상태 추적 (null = 초기 상태)
 
   useEffect(() => {
     const element = ref.current;
@@ -71,27 +73,20 @@ function useIsInView(options = {}) {
         entries.forEach((entry) => {
           const reallyInView = checkRealViewport(entry);
           const sectionName = element.getAttribute('data-section') || 'Unknown';
-          const wasInView = isInView;
-          
-          // 상태가 변경될 때만 로그 출력
-          if (reallyInView !== wasInView) {
-            const { boundingClientRect } = entry;
-            console.log(`🔍 [${sectionName}] Viewport State Changed:`, {
+          const wasInView = prevIsInViewRef.current;
+
+          // 상태가 실제로 변경될 때만 로그 출력 (초기 상태 제외)
+          if (wasInView !== null && reallyInView !== wasInView) {
+            devLog(`🔍 [${sectionName}] Viewport State Changed:`, {
               isInView: reallyInView,
               wasInView,
-              horizontalVisibilityRatio: (Math.min(boundingClientRect.right, window.innerWidth) - Math.max(boundingClientRect.left, 0)) / boundingClientRect.width,
-              verticalVisibilityRatio: (Math.min(boundingClientRect.bottom, window.innerHeight) - Math.max(boundingClientRect.top, 0)) / boundingClientRect.height,
-              intersectionRatio: entry.intersectionRatio.toFixed(2),
-              bounds: { 
-                left: boundingClientRect.left.toFixed(0), 
-                right: boundingClientRect.right.toFixed(0), 
-                top: boundingClientRect.top.toFixed(0),
-                bottom: boundingClientRect.bottom.toFixed(0),
-              },
-              scrollY: window.scrollY || window.lenis?.scroll || 0
+              scrollY: window.scrollY || window.lenis?.scroll || 0,
             });
           }
-          
+
+          // 이전 상태 업데이트
+          prevIsInViewRef.current = reallyInView;
+
           if (reallyInView && (!triggerOnce || !hasTriggered)) {
             setIsInView(true);
             if (triggerOnce) {
@@ -103,7 +98,7 @@ function useIsInView(options = {}) {
         });
       },
       {
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], // 🔧 더 세밀한 threshold 배열
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
         rootMargin,
       }
     );
@@ -115,7 +110,7 @@ function useIsInView(options = {}) {
         observerRef.current.disconnect();
       }
     };
-  }, [threshold, rootMargin, triggerOnce, hasTriggered]);
+  }, [threshold, rootMargin, triggerOnce]);
 
   return [ref, isInView];
 }

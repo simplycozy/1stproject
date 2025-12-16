@@ -1,16 +1,30 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box } from '@mui/material';
 import { useBackground } from '../../context/BackgroundContext';
+
+// 테마별 텍스트 색상 매핑
+const TEXT_COLORS = {
+  light: '#000000',
+  dark: '#ffffff',
+};
 
 /**
  * BackgroundLayer 컴포넌트
  * 전체 화면에 고정된 배경 레이어로 섹션에 따른 배경색 트랜지션을 제공
- * 
+ * CSS 커스텀 프로퍼티를 통해 텍스트 색상도 전역으로 제공 (리렌더링 방지)
+ *
  * Example usage:
  * <BackgroundLayer />
  */
 function BackgroundLayer() {
-  const { currentBackgroundColor } = useBackground();
+  const { currentBackgroundColor, backgroundMode } = useBackground();
+
+  // CSS 커스텀 프로퍼티로 텍스트 색상 설정 (React 리렌더링 없이 색상 변경)
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--theme-text-color', TEXT_COLORS[backgroundMode]);
+    root.style.setProperty('--theme-bg-color', currentBackgroundColor);
+  }, [backgroundMode, currentBackgroundColor]);
 
   return (
     <Box

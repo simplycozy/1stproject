@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
 import { gsap, ScrollTrigger } from '../../../utils/gsapConfig';
+import { devLog } from '../../../utils/logger';
 
 // 모션 블러 필터 컴포넌트
 const MotionBlurFilter = () => (
@@ -162,15 +163,15 @@ function FreeHorizontalScrollSection({
               logThrottle++ % 30 === 0; // 30프레임마다 한 번
             
             if (shouldLog) {
-              console.log('📌 [ScrollTrigger] Update:', {
-                progress: self.progress.toFixed(3),
-                direction: self.direction,
-                isActive: self.isActive,
-                scroll: self.scroll,
-                start: self.start,
-                end: self.end,
-                pin: self.vars.pin,
-              });
+              // console.log('📌 [ScrollTrigger] Update:', {
+              //   progress: self.progress.toFixed(3),
+              //   direction: self.direction,
+              //   isActive: self.isActive,
+              //   scroll: self.scroll,
+              //   start: self.start,
+              //   end: self.end,
+              //   pin: self.vars.pin,
+              // });
               lastLoggedProgress = scrollProgress;
               lastLoggedDirection = self.direction;
             }
@@ -210,7 +211,7 @@ function FreeHorizontalScrollSection({
             }
           },
           onEnter: () => {
-            console.log('📌 [ScrollTrigger] Enter - Horizontal Section');
+            devLog('📌 [ScrollTrigger] Enter - Horizontal Section');
             gsap.to(bg, {
               opacity: 1,
               duration: transitionDuration,
@@ -218,7 +219,7 @@ function FreeHorizontalScrollSection({
             });
           },
           onLeave: (self) => {
-            console.log('📌 [ScrollTrigger] Leave - Horizontal Section:', {
+            devLog('📌 [ScrollTrigger] Leave - Horizontal Section:', {
               lenisScroll: window.lenis?.scroll,
               nativeScroll: window.scrollY,
               triggerStart: self.start,
@@ -232,7 +233,7 @@ function FreeHorizontalScrollSection({
             });
           },
           onEnterBack: () => {
-            console.log('📌 [ScrollTrigger] EnterBack - Horizontal Section');
+            devLog('📌 [ScrollTrigger] EnterBack - Horizontal Section');
             gsap.to(bg, {
               opacity: 1,
               duration: transitionDuration,
@@ -240,7 +241,7 @@ function FreeHorizontalScrollSection({
             });
           },
           onLeaveBack: (self) => {
-            console.log('📌 [ScrollTrigger] LeaveBack - Horizontal Section:', {
+            devLog('📌 [ScrollTrigger] LeaveBack - Horizontal Section:', {
               lenisScroll: window.lenis?.scroll,
               nativeScroll: window.scrollY,
               triggerStart: self.start,

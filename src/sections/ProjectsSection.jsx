@@ -11,33 +11,10 @@ import { Box, Typography } from '@mui/material';
  * <ProjectsSection />
  */
 function ProjectsSection() {
-  const sectionRef = React.useRef(null);
-
-  React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // ProjectsSection 뷰포트 감지
-        });
-      },
-      { threshold: [0, 0.1, 0.5, 1.0] }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
-
   return (
     <Box
-      ref={sectionRef}
       component="section"
+      data-section="ProjectsSection"
       sx={{
         minHeight: '100vh',
         display: 'flex',

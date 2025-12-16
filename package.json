@@ -27,6 +27,7 @@
     "gsap": "^3.12.7",
     "hamburger-react": "^2.5.2",
     "mui-color-input": "^7.0.0",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-countup": "^6.5.3",
     "react-dom": "^19.0.0",

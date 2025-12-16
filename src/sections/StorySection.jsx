@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Typography } from '@mui/material';
+import useIsInView from '../hooks/useIsInView';
+import { devLog } from '../utils/logger';
 
 /**
  * StorySection
@@ -11,47 +13,34 @@ import { Box, Typography } from '@mui/material';
  * <StorySection />
  */
 function StorySection() {
-  const sectionRef = React.useRef(null);
+  const [ref, isInView] = useIsInView({ threshold: 0.3, triggerOnce: false });
+  const isFirstRender = useRef(true);
 
-  React.useEffect(() => {
-    if (sectionRef.current) {
-      sectionRef.current.setAttribute('data-section', 'StorySection');
+  // ref에 섹션 이름 추가 (디버깅용)
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.setAttribute('data-section', 'StorySection');
+    }
+  }, [ref]);
+
+  useEffect(() => {
+    // 첫 렌더링은 건너뜀 (초기 false 상태 로깅 방지)
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          console.log('📖 [StorySection] Intersection:', {
-            isIntersecting: entry.isIntersecting,
-            intersectionRatio: entry.intersectionRatio.toFixed(2),
-            boundingClientRect: {
-              top: entry.boundingClientRect.top.toFixed(0),
-              bottom: entry.boundingClientRect.bottom.toFixed(0),
-              left: entry.boundingClientRect.left.toFixed(0),
-              right: entry.boundingClientRect.right.toFixed(0),
-            },
-            scrollY: window.scrollY || window.lenis?.scroll || 0,
-          });
-        });
-      },
-      { threshold: [0, 0.1, 0.5, 1.0] }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
-    };
-  }, []);
+    devLog('📖 [StorySection] isInView changed:', {
+      isInView,
+      scrollY: window.scrollY || window.lenis?.scroll || 0,
+    });
+  }, [isInView]);
 
   return (
     <Box
-      ref={sectionRef}
+      ref={ref}
       component="section"
+      data-section="StorySection"
       sx={{
         minHeight: '100vh',
         display: 'flex',
